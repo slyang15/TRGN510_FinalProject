@@ -38,6 +38,15 @@ African American men with prostate cancer:
 
 •	1b99466b-3732-43be-a4cd-cfb304736061.htseq.counts.gz
 
+•	a97865ce-8a94-43aa-8998-4fc336300c77.htseq.counts.gz
+
+•	c7116e13-54a3-41bc-ab15-c6a1d1e1247a.htseq.counts.gz	
+
+• 8c36062e-bf1d-4d6c-be76-37d9fd4805bc.htseq.counts.gz
+
+• 456b4981-9f37-42ff-b056-883a19ebc7a9.htseq.counts.gz
+
+• 6f143139-d329-468d-ac0b-2552fb3362fd.htseq.counts.gz	
 
 Caucasian men with prostate cancer:
 
@@ -61,12 +70,24 @@ Caucasian men with prostate cancer:
 
 •	ec4a2c9d-1d81-4129-b2b9-ac500f39f7ca.htseq.counts.gz
 
+•	c7dec3e3-b999-48b9-8183-4b3515930b1d.htseq.counts.gz
+
+•	d98aa6a3-c555-40d8-adcb-5dcf74f24a9e.htseq.counts.gz
+
+• fe2ee510-b575-4983-b16e-c8c8dc699916.htseq.counts.gz	
+
+• 9f7d2a09-038f-4a98-85c9-652bdbcc9d33.htseq.counts.gz	
+
+•	992d1bbb-5540-4082-9e08-819e0272cf89.htseq.counts.gz
+
 
 ## Milestone 1
-•	My first milestone is to download 10 raw datasets in HT-seq format for each group (total 20) from TCGA and load them onto R. These datasets will be used for vignettes.
+•	My first milestone is to download 15 raw datasets in HT-seq format for each group (total 30) from TCGA and load them onto R. I will be downloading the files individually and uploading them to R in order to be able to use these datasets for the specific vignette chosen.
+    Update 11/3/20: Still in progress, will complete by 11/6/20 and post as a Rmd in Github
 
 ## Milestone 2
 •	I’ll be generating plots of the differentially expressed genes, as well as generate differential analysis.
+    Update 11/3/20: Will complete by 11/10/20
 
 ## Deliverable
 •	R MarkDown
