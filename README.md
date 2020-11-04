@@ -83,11 +83,13 @@ Caucasian men with prostate cancer:
 
 ## Milestone 1
 •	My first milestone is to download 15 raw datasets in HT-seq format for each group (total 30) from TCGA and load them onto R. I will be downloading the files individually and uploading them to R in order to be able to use these datasets for the specific vignette chosen.
-    Update 11/3/20: Still in progress, will complete by 11/6/20 and post as a Rmd in Github
+   
+     Update 11/3/20: Still in progress, will complete by 11/6/20 and post as a Rmd in Github
 
 ## Milestone 2
 •	I’ll be generating plots of the differentially expressed genes, as well as generate differential analysis.
-    Update 11/3/20: Will complete by 11/10/20
+    
+     Update 11/3/20: Will complete by 11/10/20
 
 ## Deliverable
 •	R MarkDown
