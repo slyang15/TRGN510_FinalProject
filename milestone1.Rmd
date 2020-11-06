@@ -1,0 +1,77 @@
+---
+title: "TRGN510 Final Project"
+output:
+  html_document:
+    df_print: paged
+---
+
+##Loading packages
+```{r}
+setwd("/Users/seolynyang/Desktop/510final")
+
+if (!requireNamespace("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+BiocManager::install("limma")
+BiocManager::install("Glimma")
+BiocManager::install("edgeR")
+BiocManager::install("Homo.sapiens")
+
+library(limma)
+library(Glimma)
+library(edgeR)
+library(Homo.sapiens)
+
+```
+
+##Entering the data into R
+```{r}
+files <- c("176faa66-9eb4-4d1e-b7fe-08d34db0e44f.htseq.counts",
+           "2a178039-8f10-43d6-b6f5-fae66d92b6a5.htseq.counts",
+           "4e5e3af9-5d29-4ab0-a219-3242544064e4.htseq.counts",
+           "30684606-b403-43ca-830f-05bc75ab7ac9.htseq.counts",
+           "3b552b52-0bd4-458c-95f9-effe849ecc26.htseq.counts",
+           "80d9227d-b41b-44eb-b230-cb1c14b5ee1a.htseq.counts",
+           "acb3e352-b255-4c41-b90f-5e5ed2273b06.htseq.counts",
+           "eff2d9bb-5bfd-451b-94f9-37080e4611ec.htseq.counts",
+           "438b9759-ae94-4ba7-861c-9b1656ad8ed6.htseq.counts",
+           "1b99466b-3732-43be-a4cd-cfb304736061.htseq.counts",
+           "a97865ce-8a94-43aa-8998-4fc336300c77.htseq.counts",
+           "c7116e13-54a3-41bc-ab15-c6a1d1e1247a.htseq.counts",
+           "8c36062e-bf1d-4d6c-be76-37d9fd4805bc.htseq.counts",
+           "456b4981-9f37-42ff-b056-883a19ebc7a9.htseq.counts",
+           "6f143139-d329-468d-ac0b-2552fb3362fd.htseq.counts",
+           
+           "94043a2d-b9e2-426d-9e89-6213034332f6.htseq.counts",
+           "326bcde3-94ad-4b17-ab61-733e7cf6ff2f.htseq.counts",
+           "b7174918-6cea-417e-8a86-f3a61ad81153.htseq.counts",
+           "430669ee-998d-4917-83b6-ee7f0b6cae46.htseq.counts",
+           "81ef037f-28d3-4960-b814-37af7ff8f972.htseq.counts",
+           "5e3fd2aa-e0dd-4fe8-9944-05bba5d6bd91.htseq.counts",
+           "362f67f1-4837-4245-ae7b-76d596575fd4.htseq.counts",
+           "9fc9128a-5cf9-4991-81b5-754092c301b1.htseq.counts",
+           "070af2c9-b54f-41e2-a48d-a7e3bfaa9025.htseq.counts",
+           "ec4a2c9d-1d81-4129-b2b9-ac500f39f7ca.htseq.counts",
+           "c7dec3e3-b999-48b9-8183-4b3515930b1d.htseq.counts",
+           "d98aa6a3-c555-40d8-adcb-5dcf74f24a9e.htseq.counts",
+           "fe2ee510-b575-4983-b16e-c8c8dc699916.htseq.counts",
+           "9f7d2a09-038f-4a98-85c9-652bdbcc9d33.htseq.counts",
+           "992d1bbb-5540-4082-9e08-819e0272cf89.htseq.counts"
+           )
+read.delim(files[1], nrow=5, header = FALSE)
+
+```
+
+```{r}
+x <- readDGE(files, columns=c(1,2))
+class(x)
+dim(x)
+```
+Each file contains 60487 genes and have a sample size of 30 people
+
+## Organizing sample information
+
+```{r}
+samplenames <- colnames(x)
+samplenames
+```
+
