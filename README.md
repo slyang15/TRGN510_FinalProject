@@ -16,6 +16,7 @@ Lynn Yang (seolynya@usc.edu)
 ## Data:
 •	Data will be obtained from the TCGA database on GDC.
 
+         Update 11/12/20: The datasets that I was looking at did not have the information I needed so I changed my dataset entirely.
 African Americans with lung cancer: 
 
 • 12d2b9fa-1921-4033-bdb9-7e114c0d7812.htseq.counts.gz (female)
