@@ -1,0 +1,321 @@
+---
+title: "TRGN510 Final Project"
+output:
+  html_document:
+    df_print: paged
+---
+
+##Loading packages
+```{r}
+setwd("/Users/seolynyang/Desktop/510final")
+
+#if (!requireNamespace("BiocManager", quietly = TRUE))
+#    install.packages("BiocManager")
+#BiocManager::install("limma")
+#BiocManager::install("Glimma")
+#BiocManager::install("edgeR")
+#BiocManager::install("Homo.sapiens")
+
+install.packages("gsubfn")
+
+library(limma)
+library(Glimma)
+library(edgeR)
+library(Homo.sapiens)
+library(gsubfn)
+
+```
+
+##Entering the data into R
+```{r}
+files <- c("12d2b9fa-1921-4033-bdb9-7e114c0d7812.htseq.counts",
+           "0c0d8887-ff41-46ae-9aba-f6f98f8c1c5e.htseq.counts",
+           "90af0faf-3e8c-4741-bf49-f87a5b21d54c.htseq.counts",
+           "16c42b24-fcaf-43e2-8f52-d7488f82257b.htseq.counts",
+           "3532ec0a-2563-420a-b71c-3dcc632ef477.htseq.counts",
+           "156c4f8b-4467-46d0-bc55-085a29377f3e.htseq.counts",
+           "f93932b6-c8c3-45d8-9911-c4d387d9bad0.htseq.counts",
+           "e38ee2d6-eaad-4d39-a7f3-951b1532c9e5.htseq.counts",
+           "6011bac0-a278-42b4-bfd9-97f1b618926e.htseq.counts",
+           "ac5bc405-b210-4bf3-a4e6-6ff071aa59c7.htseq.counts",
+           "b32ed1d3-c9f1-42c7-ad2a-32794591a839.htseq.counts",
+           "96717cca-f561-43ee-8fac-74c9aa43c202.htseq.counts",
+           "bf8dd7a7-37b1-4a81-9554-d63fdf2fe4f1.htseq.counts",
+           "f67ccdd6-1577-45fd-9e49-251b289d1179.htseq.counts",
+           "ebe06b50-91d3-4a79-bc8f-6564742c1652.htseq.counts",
+           "c9381f51-ec09-4487-88a4-8e94452e4893.htseq.counts",
+           "3ce57f19-ef4b-4bb9-8530-eb0752975f4b.htseq.counts",
+           "2cea6dae-c807-428b-90c8-617b260d3975.htseq.counts",
+           "cc54e123-c06a-48a8-b864-7497ecb37c0b.htseq.counts",
+           "6476b6b8-7e7e-44ac-9869-c93b654458a5.htseq.counts",
+           "cc296619-683f-4339-ab1f-51d567fc678a.htseq.counts",
+           "7ea958f2-f45d-4549-9d45-07c51eebae99.htseq.counts",
+           "60be1c92-8f57-45b0-adc8-eb2f2d0e3805.htseq.counts",
+           "f994e1d7-6427-4884-8993-f930c6331bff.htseq.counts",
+           "d370b7a3-a534-4190-a6d0-79276273093c.htseq.counts",
+           "9c62a984-f89a-4838-af13-786468b293c1.htseq.counts",
+           "027ec9be-7e41-44df-8f61-1e5698303eac.htseq.counts",
+           "057c6a18-e5f2-4eba-9c20-c483c5a67cc3.htseq.counts",
+           "ce4ac30d-f2e6-40f3-a2db-fdcf0218b8fb.htseq.counts",
+           "8e1d09e8-6dbd-408d-a839-f5bbebe30a57.htseq.counts",
+           "4c8648f5-26ca-4550-b51b-bd2228b1e8e0.htseq.counts",
+           "06b1bbf5-07e5-4a03-aea1-f7203bab2572.htseq.counts",
+           "f9ea29ab-6953-4646-b367-cff2483b9f46.htseq.counts",
+           "5260addc-0596-42c0-85c6-b74744db9cda.htseq.counts",
+           "6095fc44-4542-4435-8e6b-dba09b3f7f92.htseq.counts",
+           "783a2365-c4a2-4db4-ab14-d52e603d8230.htseq.counts"
+           )
+read.delim(files[1], nrow=5, header = FALSE)
+
+```
+
+```{r}
+x <- readDGE(files, columns=c(1,2))
+class(x)
+dim(x)
+```
+Each file contains 60487 genes and have a sample size of 36 people
+
+## Organizing sample information
+
+```{r}
+samplenames <- substring(colnames(x), 12, nchar(colnames(x)))
+samplenames
+x$samples
+
+```
+
+# Identifying which files are for AA and Caucasians
+```{r}
+colnames(x) <- samplenames
+group <- as.factor(c(rep("Black", 18), c(rep("White",18))))
+group
+x$samples$group <- group
+lane <- as.factor(rep(c("female","male", "female", "male"), c(9,9,9,9)))
+lane
+x$samples$lane <- lane 
+x$samples
+```
+# Looking for geneID's that match ENSEMBL ID
+
+```{r}
+geneid <- rownames(x)
+#to remove decimals and numbers after .
+geneid <- gsub("\\.[0-9]*$", "", geneid) 
+genes <- select(Homo.sapiens, keys = geneid, columns=c("SYMBOL", "TXCHROM"), keytype="ENSEMBL")
+head(genes)  
+
+```
+# To checkk for duplicated gene IDs
+```{r}
+genes <- genes[!duplicated(genes$ENSEMBL),]
+x$genes <- genes
+x
+```
+
+#Data pre-processing: transformations from the raw-scale
+```{r}
+cpm <- cpm(x)
+lcpm <- cpm(x, log=TRUE)
+L <- mean(x$samples$lib.size) * 1e-6
+M <- median(x$samples$lib.size) * 1e-6
+c(L, M)
+```
+
+```{r}
+summary(lcpm)
+```
+
+# Removing genes that are lowly expressed
+```{r}
+table(rowSums(x$counts==0)==9)
+
+```
+
+#Filter genes to keep good genes
+```{r}
+keep.exprs <- filterByExpr(x, group=group)
+x <- x[keep.exprs,, keep.lib.sizes=FALSE]
+dim(x)
+```
+
+# Generate density of log-CPM values for raw pre-filtered and post-filtered data
+```{r}
+lcpm.cutoff <- log2(10/M + 2/L)
+library(RColorBrewer)
+nsamples <- ncol(x)
+col <- brewer.pal(nsamples, "Paired")
+par(mfrow=c(1,2))
+plot(density(lcpm[,1]), col=col[1], lwd=2, ylim=c(0,0.26), las=2, main="", xlab="")
+title(main="A. Raw data", xlab="Log-cpm")
+abline(v=lcpm.cutoff, lty=3)
+for (i in 2:nsamples){
+den <- density(lcpm[,i])
+lines(den$x, den$y, col=col[i], lwd=2)
+}
+legend("topright", samplenames, text.col=col, bty="n")
+lcpm <- cpm(x, log=TRUE)
+plot(density(lcpm[,1]), col=col[1], lwd=2, ylim=c(0,0.26), las=2, main="", xlab="")
+title(main="B. Filtered data", xlab="Log-cpm")
+abline(v=lcpm.cutoff, lty=3)
+for (i in 2:nsamples){
+den <- density(lcpm[,i])
+lines(den$x, den$y, col=col[i], lwd=2)
+}
+legend("topright", samplenames, text.col=col, bty="n")
+```
+# Normalising gene expression distributions
+
+```{r}
+x <- calcNormFactors(x, method = "TMM")
+x$samples$norm.factors
+```
+
+# For better visualization of normalization effects
+```{r}
+x2 <- x
+x2$samples$norm.factors <- 1
+x2$counts[,1] <- ceiling(x2$counts[,1]*0.05)
+x2$counts[,2] <- x2$counts[,2]*5
+
+```
+#Expression distribution of samples for unnormalized and normalized data
+
+```{r}
+
+par(mfrow=c(1,2))
+lcpm <- cpm(x2, log=TRUE)
+boxplot(lcpm, las=2, col=col, main="")
+title(main="A. Example: Unnormalised data",ylab="Log-cpm")
+x2 <- calcNormFactors(x2)  
+x2$samples$norm.factors
+
+lcpm <- cpm(x2, log=TRUE)
+boxplot(lcpm, las=2, col=col, main="")
+title(main="B. Example: Normalised data",ylab="Log-cpm")
+```
+
+#Clustering of samples 
+```{r}
+lcpm <- cpm(x, log=TRUE)
+par(mfrow=c(1,2))
+col.group <- c("Yellow", "Purple") [group]
+levels(col.group) <-  brewer.pal(nlevels(col.group), "Set1")
+col.group <- as.character(col.group)
+plotMDS(lcpm, labels=group, col=col.group)
+title(main="A. Sample groups")
+
+col.lane <- lane
+levels(col.lane) <-  brewer.pal(nlevels(col.lane), "Set2")
+col.lane <- as.character(col.lane)
+
+plotMDS(lcpm, labels=lane, col=col.lane, dim=c(3,4))
+title(main="B. Sequencing lanes")
+```
+# explore multiple dimensions with MDS plot
+```{r}
+glMDSPlot(lcpm, labels=paste(group, lane, sep="_"), 
+          groups=x$samples[,c(2,5)], launch=FALSE)
+```
+
+
+## Differential expression analysis 
+# Create a design matrix 
+```{r}
+design <- model.matrix(~0+group+lane)
+colnames(design) <- gsub("group", "", colnames(design))
+design
+```
+
+#set up model contrasts
+```{r}
+contr.matrix <- makeContrasts(
+   BlackvsWhite = Black-White, 
+   levels = colnames(design))
+contr.matrix
+```
+
+#Removing heteroscedascity from count data
+
+```{r}
+par(mfrow=c(1,2))
+v <- voom(x, design, plot=TRUE)
+v
+```
+
+#application of voom precision weights to the data 
+```{r}
+vfit <- lmFit(v, design)
+vfit <- contrasts.fit(vfit, contrasts=contr.matrix)
+efit <- eBayes(vfit)
+plotSA(efit, main="Final model: Mean-variance trend")
+```
+
+#Examining the number of differentially expressed genes
+```{r}
+summary(decideTests(efit))
+
+```
+
+#when testing requires genes to have a log-FC that is significantly greater than 1
+```{r}
+tfit <- treat(vfit, lfc=0)
+dt <- decideTests(tfit)
+summary(dt)
+```
+
+```{r}
+de.common <- which(dt[,1]!=0)
+length(de.common)
+```
+
+```{r}
+head(tfit$genes$SYMBOL[de.common])
+
+```
+
+```{r}
+vennDiagram(dt[,1], circle.col=c("turquoise", "salmon"))
+
+```
+```{r}
+write.fit(tfit, dt, file="results.txt")
+
+```
+
+# Examining individual DE genes from top to bottom
+```{r}
+Black.vs.White <- topTreat(tfit, coef=1, n=Inf)
+head(Black.vs.White)
+```
+# graphical representations of DE results
+```{r}
+plotMD(tfit, column=1, status=dt[,1], main=colnames(tfit)[1], 
+       xlim=c(-8,13))
+```
+```{r}
+library(Glimma)
+glMDPlot(tfit, coef=1, status=dt, main=colnames(tfit)[1],
+         side.main="ENSEMBL", counts=lcpm, groups=group, launch=TRUE)
+```
+
+
+# Heatmap for the top 100 DE genes, ranked by adjusted p-value
+```{r}
+library(gplots)
+Black.vs.White.topgenes <- Black.vs.White$ENSEMBL[1:100]
+i <- which(v$genes$ENSEMBL %in% Black.vs.White.topgenes)
+mycol <- colorpanel(1000,"blue","white","red")
+heatmap.2(lcpm[i,], scale="row",
+   labRow=v$genes$SYMBOL[i], labCol=group, 
+   col=mycol, trace="none", density.info="none", 
+   margin=c(8,6), lhei=c(2,10), dendrogram="column")
+```
+
+```{r}
+load(system.file("extdata", "human_c2_v5p2.rda", package = "RNAseq123"))
+idx <- ids2indices(Mm.c2,id=rownames(v))
+cam.BasalvsLP <- camera(v,idx,design,contrast=contr.matrix[,1])
+head(cam.BasalvsLP,5)
+```
+
