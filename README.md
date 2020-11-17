@@ -17,6 +17,7 @@ Lynn Yang (seolynya@usc.edu)
 •	Data will be obtained from the TCGA database on GDC.
 
          Update 11/12/20: The datasets that I was looking at did not have the information I needed so I changed my dataset entirely.
+         
 African Americans with lung cancer: 
 
 • 12d2b9fa-1921-4033-bdb9-7e114c0d7812.htseq.counts.gz (female)
@@ -54,6 +55,7 @@ African Americans with lung cancer:
 • 96717cca-f561-43ee-8fac-74c9aa43c202.htseq.counts.gz (male)
 
 • bf8dd7a7-37b1-4a81-9554-d63fdf2fe4f1.htseq.counts.gz (male)
+
 
 Caucasians with lung cancer:
 
@@ -109,7 +111,9 @@ Caucasians with lung cancer:
      
 ## Known Issues: 
 • There is a problem with naming the genes that are differentially expressed: head(tfit$genes$SYMBOL[de.common], n = 2). The output comes out as [1] NA NA.
+
 • The last part (Gene set testing with camera) did not work.
+
 • The log-fold-change was changed from the original 1 to 0.1 in order to detect more up and down regulated genes.
 
 
