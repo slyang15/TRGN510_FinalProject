@@ -106,6 +106,12 @@ Caucasians with lung cancer:
     
      Update 11/3/20: Will complete by 11/10/20
      Update 11/10/20: Completed
+     
+## Known Issues: 
+• There is a problem with naming the genes that are differentially expressed: head(tfit$genes$SYMBOL[de.common], n = 2). The output comes out as [1] NA NA.
+• The last part (Gene set testing with camera) did not work.
+• The log-fold-change was changed from the original 1 to 0.1 in order to detect more up and down regulated genes.
+
 
 ## Deliverable
 •	R MarkDown
